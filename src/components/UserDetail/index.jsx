@@ -1,55 +1,60 @@
 import React from "react";
-import { AppBar, Toolbar, Typography } from "@mui/material";
-import { useLocation, matchPath } from "react-router-dom";
-import models from "../../modelData/models";
+import {
+    Typography,
+    Card,
+    CardContent,
+    CardActions,
+    Button,
+} from "@mui/material";
+import { Link, useParams } from "react-router-dom";
 import "./styles.css";
+import models from "../../modelData/models";
 
 /**
- * Define TopBar, a React component of Project 4.
+ * Define UserDetail, a React component of Project 4.
  */
-function TopBar() {
-    const location = useLocation();
-    let contextText = ""; // Default context
+function UserDetail() {
+    // Use useParams hook to get the userId from the URL
+    const { userId } = useParams();
+    const user = models.userModel(userId);
 
-    // Check for User Detail page: /users/:userId
-    const matchUserDetail = matchPath("/users/:userId", location.pathname);
-    if (matchUserDetail) {
-        const userId = matchUserDetail.params.userId;
-        const user = models.userModel(userId);
-        if (user) {
-            contextText = `${user.first_name} ${user.last_name}`;
-        }
-    }
-
-    // Check for User Photos page: /photos/:userId
-    const matchUserPhotos = matchPath("/photos/:userId", location.pathname);
-    if (matchUserPhotos) {
-        const userId = matchUserPhotos.params.userId;
-        const user = models.userModel(userId);
-        if (user) {
-            contextText = `Photos of ${user.first_name} ${user.last_name}`;
-        }
-    }
-
-    // Check for User List page: /users
-    const matchUserList = matchPath("/users", location.pathname);
-    if (matchUserList) {
-        contextText = "User List";
+    if (!user) {
+        return <Typography>User not found.</Typography>;
     }
 
     return (
-        <AppBar className="topbar-appBar" position="absolute">
-            {/* Use style to spread content to left and right */}
-            <Toolbar style={{ justifyContent: "space-between" }}>
-                <Typography variant="h5" color="inherit">
-                    B22DCAT036 - Nguyen Thai Bang
+        <Card>
+            <CardContent>
+                <Typography variant="h4" gutterBottom>
+                    {`${user.first_name} ${user.last_name}`}
                 </Typography>
-                <Typography variant="h5" color="inherit">
-                    {contextText}
+
+                <Typography variant="body1" gutterBottom>
+                    <strong>Location:</strong> {user.location}
                 </Typography>
-            </Toolbar>
-        </AppBar>
+
+                <Typography variant="body1" gutterBottom>
+                    <strong>Occupation:</strong> {user.occupation}
+                </Typography>
+
+                <Typography variant="body1" style={{ marginTop: "15px" }}>
+                    <strong>Description:</strong> {user.description}
+                </Typography>
+            </CardContent>
+
+            <CardActions>
+                {/* Button to navigate to this user's photos */}
+                <Button
+                    component={Link}
+                    to={`/photos/${user._id}`}
+                    variant="contained"
+                    color="primary"
+                >
+                    View Photos
+                </Button>
+            </CardActions>
+        </Card>
     );
 }
 
-export default TopBar;
+export default UserDetail;
